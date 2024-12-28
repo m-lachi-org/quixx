@@ -7,12 +7,11 @@ import de.milac.quixx.event.RowClosedEvent;
 import de.milac.quixx.layout.AscendingNumbers;
 import de.milac.quixx.layout.RowLayout;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Row extends EventHandler implements EventSource {
 	private final Color color;
-	private final Cell[] cells;
+	private final List<Cell> cells;
 	private int firstActive = 0;
 
 	public Row(Color color) {
@@ -22,13 +21,20 @@ public class Row extends EventHandler implements EventSource {
 	public Row(Color color, RowLayout layout) {
 		super();
 		this.color = color;
+		cells = fillCells(color, layout);
+	}
+
+	private List<Cell> fillCells(Color color, RowLayout layout) {
+		final List<Cell> cells;
 		cells = layout.fillCells(color);
+		cells.add(new Cell(getColor(), cells.size(), 0));
+		return cells;
 	}
 
 	public MatchResult findMatch(int... sums) {
 		if (isActive()) {
-			for (int i = firstActive; i < cells.length; i++) {
-				Cell cell = cells[i];
+			for (int i = firstActive; i < cells.size(); i++) {
+				Cell cell = cells.get(i);
 				for (int sum : sums) {
 					if (cell.match(sum)) {
 						return MatchResult.of(cell, color, firstActive);
@@ -40,12 +46,17 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	private int shift(int currentPos) {
-		boolean closed = currentPos == cells.length-1;
+		boolean closed = currentPos == cells.size()-2;
 		if (closed) {
-			System.out.println("Closing row " + color);
-			fire(RowClosedEvent.of(color));
+			close();
 		}
 		return closed ? -1 : currentPos+1;
+	}
+
+	private void close() {
+		System.out.println("Closing row " + color);
+		check(cells.get(cells.size()-1));
+		fire(RowClosedEvent.of(color));
 	}
 
 	public Color getColor() {
@@ -83,7 +94,7 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	public long nrOfChecked() {
-		return Arrays.stream(cells).filter(Cell::isChecked).count();
+		return cells.stream().filter(Cell::isChecked).count();
 	}
 
 	public void check(Cell cell) {
