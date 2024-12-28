@@ -1,4 +1,7 @@
-package de.milac.quixx;
+package de.milac.quixx.strategy;
+
+import de.milac.quixx.Cell;
+import de.milac.quixx.MatchResult;
 
 import java.util.ArrayList;
 import java.util.List;

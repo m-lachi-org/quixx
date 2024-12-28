@@ -1,4 +1,4 @@
-package de.milac.quixx;
+package de.milac.quixx.event;
 
 import java.util.ArrayList;
 import java.util.HashMap;

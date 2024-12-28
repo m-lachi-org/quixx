@@ -1,5 +1,8 @@
 package de.milac.quixx;
 
+import de.milac.quixx.strategy.SimpleStrategy;
+import de.milac.quixx.strategy.Strategy;
+
 public class Player {
 	private final String name;
 	private final Scorecard scorecard;

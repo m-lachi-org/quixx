@@ -1,24 +1,28 @@
 package de.milac.quixx;
 
+import de.milac.quixx.event.Event;
+import de.milac.quixx.event.EventHandler;
+import de.milac.quixx.event.EventSource;
+import de.milac.quixx.event.RowClosedEvent;
+import de.milac.quixx.layout.AscendingNumbers;
+import de.milac.quixx.layout.RowLayout;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class Row extends EventHandler implements EventSource {
 	private final Color color;
-	private Cell[] cells;
+	private final Cell[] cells;
 	private int firstActive = 0;
 
 	public Row(Color color) {
-		super();
-		this.color = color;
-		fillCells();
+		this(color, new AscendingNumbers());
 	}
 
-	private void fillCells() {
-		cells = new Cell[11];
-		for (int i = 0; i < cells.length; i++) {
-			cells[i] = new Cell(color, i, i+2);
-		}
+	public Row(Color color, RowLayout layout) {
+		super();
+		this.color = color;
+		cells = layout.fillCells(color);
 	}
 
 	public MatchResult findMatch(int... sums) {
@@ -49,7 +53,7 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	@Override
-	List<Class<? extends Event>> eventsOfInterest() {
+	public List<Class<? extends Event>> eventsOfInterest() {
 		return List.of(RowClosedEvent.class);
 	}
 

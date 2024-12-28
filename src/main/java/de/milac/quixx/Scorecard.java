@@ -1,7 +1,10 @@
 package de.milac.quixx;
 
+import de.milac.quixx.layout.CardLayout;
+import de.milac.quixx.layout.DefaultCardLayout;
+import de.milac.quixx.strategy.Strategy;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,19 +12,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static de.milac.quixx.Color.*;
 
 public class Scorecard {
-	private final Map<Color, Row> rows = new HashMap<>();
+	private final Map<Color, Row> rows;
 	private int nrOfMisses = 0;
 	private final Strategy strategy;
 
-	{
-		rows.put(RED, new Row(RED));
-		rows.put(YELLOW, new Row(YELLOW));
-		rows.put(GREEN, new Row(GREEN));
-		rows.put(BLUE, new Row(BLUE));
+	public Scorecard(Strategy strategy) {
+		this(strategy, new DefaultCardLayout());
 	}
 
-	public Scorecard(Strategy strategy) {
+	public Scorecard(Strategy strategy, CardLayout layout) {
 		this.strategy = strategy;
+		rows = layout.fillRows();
 	}
 
 	public void matchOnTurn(DiceCup dices) {

@@ -1,4 +1,6 @@
-package de.milac.quixx;
+package de.milac.quixx.event;
+
+import de.milac.quixx.Color;
 
 public class RowClosedEvent implements Event {
 	private final Color color;
