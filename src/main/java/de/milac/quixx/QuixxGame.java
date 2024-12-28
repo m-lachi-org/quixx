@@ -17,7 +17,7 @@ public class QuixxGame {
 			, new Player("Player3")
 			, new Player("Player4")
 		);
-		Round round = game.nextRound();
+		Round round = game.start();
 		while (round.play()) {
 			round = game.nextRound();
 		}
@@ -35,6 +35,10 @@ public class QuixxGame {
 		AtomicInteger i = new AtomicInteger(0);
 		scores.entrySet().stream().sorted(Map.Entry.<Score, Player>comparingByKey().reversed())
 			.forEach(e -> System.out.printf("%s: %s%s%n", e.getValue(), e.getKey(), i.getAndIncrement() == 0 ? " <-- winner after " + Round.getCount() + " rounds!" : ""));
+	}
+
+	private Round start() {
+		return nextRound();
 	}
 
 	private Round nextRound() {
