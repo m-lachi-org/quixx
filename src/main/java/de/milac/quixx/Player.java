@@ -1,5 +1,6 @@
 package de.milac.quixx;
 
+import de.milac.quixx.dice.DiceCup;
 import de.milac.quixx.strategy.SimpleStrategy;
 import de.milac.quixx.strategy.Strategy;
 
@@ -25,11 +26,11 @@ public class Player {
 		return scorecard;
 	}
 
-	public void matchOnTurn(DiceCup dices) {
-		scorecard.matchOnTurn(dices);
+	public void matchOnTurn(DiceCup diceCup) {
+		scorecard.matchOnTurn(diceCup);
 	}
 
-	public void match(DiceCup dices) {
-		scorecard.match(dices);
+	public void match(DiceCup diceCup) {
+		scorecard.match(diceCup);
 	}
 }

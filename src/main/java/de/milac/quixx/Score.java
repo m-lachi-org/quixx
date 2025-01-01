@@ -50,4 +50,12 @@ public class Score implements Comparable<Score> {
 	public int getTotal() {
 		return total;
 	}
+
+	int getRowScore(Color color) {
+		return rowScores.getOrDefault(color, 0);
+	}
+
+	public int getMisses() {
+		return misses;
+	}
 }

@@ -1,5 +1,6 @@
 package de.milac.quixx;
 
+import de.milac.quixx.dice.DiceCup;
 import de.milac.quixx.layout.CardLayout;
 import de.milac.quixx.layout.DefaultCardLayout;
 import de.milac.quixx.strategy.Strategy;
@@ -25,9 +26,9 @@ public class Scorecard {
 		rows = layout.fillRows();
 	}
 
-	public void matchOnTurn(DiceCup dices) {
-		List<MatchResult> possibleMatchesWhite = findPossibleMatchesWhite(dices);
-		List<MatchResult> possibleMatchesColored = findPossibleMatchesColored(dices)
+	public void matchOnTurn(DiceCup diceCup) {
+		List<MatchResult> possibleMatchesWhite = findPossibleMatchesWhite(diceCup);
+		List<MatchResult> possibleMatchesColored = findPossibleMatchesColored(diceCup)
 			.stream().filter(mr -> !possibleMatchesWhite.contains(mr)).toList();
 		boolean matchFound = possibleMatchesWhite.stream().anyMatch(MatchResult::isPresent) ||
 			possibleMatchesColored.stream().anyMatch(MatchResult::isPresent);
@@ -45,34 +46,37 @@ public class Scorecard {
 		}
 	}
 
-	public void match(DiceCup dices) {
-		List<MatchResult> possibleMatches = findPossibleMatchesWhite(dices);
+	public void match(DiceCup diceCup) {
+		List<MatchResult> possibleMatches = findPossibleMatchesWhite(diceCup);
 		AtomicBoolean matchFound = new AtomicBoolean(possibleMatches.stream().anyMatch(MatchResult::isPresent));
 		if (matchFound.get()) {
 			strategy.bestMatches(possibleMatches)
 				.ifPresentOrElse(this::check, () -> matchFound.set(false));
 		}
+		if (!matchFound.get()) {
+			System.out.println("Nothing matches!");
+		}
 	}
 
-	private List<MatchResult> findPossibleMatchesWhite(DiceCup dices) {
+	List<MatchResult> findPossibleMatchesWhite(DiceCup diceCup) {
 		List<MatchResult> possibleMatches = new ArrayList<>();
 		for (Row row : rows.values()) {
-			possibleMatches.add(row.findMatch(dices.sumOf(WHITE)));
+			possibleMatches.add(row.findMatch(diceCup.sumOf(WHITE)));
 		}
 		return possibleMatches;
 	}
 
-	private List<MatchResult> findPossibleMatchesColored(DiceCup dices) {
+	List<MatchResult> findPossibleMatchesColored(DiceCup diceCup) {
 		List<MatchResult> possibleMatches = new ArrayList<>();
 		for (Row row : rows.values()) {
-			if (dices.hasColor(row.getColor())) {
-				possibleMatches.add(row.findMatch(dices.sumOf(row.getColor())));
+			if (diceCup.hasColor(row.getColor())) {
+				possibleMatches.add(row.findMatch(diceCup.sumOf(row.getColor())));
 			}
 		}
 		return possibleMatches;
 	}
 
-	private void check(Cell cell) {
+	void check(Cell cell) {
 		rows.get(cell.getColor()).check(cell);
 	}
 
@@ -100,5 +104,9 @@ public class Scorecard {
 
 	public int getNrOfMisses() {
 		return nrOfMisses;
+	}
+
+	public Row getRow(Color color) {
+		return rows.get(color);
 	}
 }

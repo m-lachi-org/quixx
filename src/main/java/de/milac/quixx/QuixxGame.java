@@ -6,7 +6,7 @@ import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
 public class QuixxGame {
-	private final List<Player> players = new ArrayList<>();
+	private final List<Player> players = new LinkedList<>();
 	private int currentPlayer = -1;
 
 	public static void main(String[] args) {
@@ -41,7 +41,12 @@ public class QuixxGame {
 		return nextRound();
 	}
 
-	private Round nextRound() {
+	Round nextRound() {
+		if (players.isEmpty()) {
+			throw new IllegalStateException("No players have joined yet");
+		} else if (players.size() < 2) {
+			throw new IllegalStateException("At least two players must join");
+		}
 		if (currentPlayer < 0 ) {
 			System.out.printf("Starting new game with players %s%n", players);
 			currentPlayer = RandomGenerator.getDefault().nextInt(players.size());
@@ -53,12 +58,19 @@ public class QuixxGame {
 		return new Round(roundPlayer, coPlayersOf(roundPlayer));
 	}
 
-	private List<Player> coPlayersOf(Player roundPlayer) {
+	List<Player> coPlayersOf(Player roundPlayer) {
 		return players.stream().filter(p -> !p.equals(roundPlayer)).collect(Collectors.toList());
 	}
 
-	private void join(Player... playersToJoin) {
+	void join(Player... playersToJoin) {
 		players.addAll(Arrays.asList(playersToJoin));
 	}
 
+	List<Player> getPlayers() {
+		return players;
+	}
+
+	int getCurrentPlayer() {
+		return currentPlayer;
+	}
 }

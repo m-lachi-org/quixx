@@ -11,7 +11,7 @@ public class MatchResult {
 	private MatchResult(Cell match, Color color, int firstActiveInRow) {
 		this.match = match;
 		this.color = color;
-		this.distanceToFirstActive = Optional.ofNullable(this.match).map(Cell::getPos).orElse(0) - firstActiveInRow;
+		this.distanceToFirstActive = Optional.ofNullable(this.match).map(Cell::getPos).orElse(-1) - (Math.max(firstActiveInRow, 0));
 	}
 
 	public static MatchResult of(Cell match, Color color, int firstActiveInRow) {
@@ -23,7 +23,7 @@ public class MatchResult {
 	}
 
 	public boolean isEmpty() {
-		return match == null;
+		return getMatch().isEmpty();
 	}
 
 	public boolean isPresent() {

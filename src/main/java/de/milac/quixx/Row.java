@@ -8,6 +8,7 @@ import de.milac.quixx.layout.AscendingNumbers;
 import de.milac.quixx.layout.RowLayout;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Row extends EventHandler implements EventSource {
 	private final Color color;
@@ -24,7 +25,7 @@ public class Row extends EventHandler implements EventSource {
 		cells = fillCells(color, layout);
 	}
 
-	private List<Cell> fillCells(Color color, RowLayout layout) {
+	List<Cell> fillCells(Color color, RowLayout layout) {
 		final List<Cell> cells;
 		cells = layout.fillCells(color);
 		cells.add(new Cell(getColor(), cells.size(), 0));
@@ -45,18 +46,25 @@ public class Row extends EventHandler implements EventSource {
 		return MatchResult.empty(color, firstActive);
 	}
 
-	private int shift(int currentPos) {
-		boolean closed = currentPos == cells.size()-2;
-		if (closed) {
-			close();
-		}
-		return closed ? -1 : currentPos+1;
+	Cell getCellAt(int idx) {
+		return cells.get(idx);
 	}
 
-	private void close() {
-		System.out.println("Closing row " + color);
-		check(cells.get(cells.size()-1));
-		fire(RowClosedEvent.of(color));
+	Cell getCellOfValue(int value) {
+		return cells.stream().filter(c -> c.getValue() == value).findFirst()
+			.orElseThrow(() -> new NoSuchElementException(String.format("No cell found for value %d", value)));
+	}
+
+	void shiftOrClose(int currentPos) {
+		if (!isClosed()) {
+			boolean closed = currentPos >= cells.size() - 2;
+			firstActive = closed ? -1 : currentPos + 1;
+			if (closed) {
+				System.out.println("Closing row " + color);
+				check(cells.get(cells.size() - 1));
+				fire(RowClosedEvent.of(color));
+			}
+		}
 	}
 
 	public Color getColor() {
@@ -99,6 +107,10 @@ public class Row extends EventHandler implements EventSource {
 
 	public void check(Cell cell) {
 		cell.check();
-		firstActive = shift(cell.getPos());
+		shiftOrClose(cell.getPos());
+	}
+
+	public int getFirstActive() {
+		return firstActive;
 	}
 }

@@ -32,7 +32,7 @@ public class Cell {
 		return this.value == value;
 	}
 
-	public void check() {
+	void check() {
 		state = CHECKED;
 		System.out.println(this);
 	}
