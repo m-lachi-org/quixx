@@ -85,12 +85,20 @@ public class Row extends EventHandler implements EventSource {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(String.format("%6s |", color));
+		StringBuilder sb = new StringBuilder(String.format("%s%s |", span(7, color.name()), color.dyedName()));
 		for (Cell c : cells) {
-			sb.append(String.format(" %2d(%s) |", c.getValue(), c.getState().getSymbol()));
+			sb.append(String.format("%s%s %s%s%s |",
+				span(3, String.valueOf(c.getValue())),
+				color.dye(String.valueOf(c.getValue())),
+				color.dye("("), c.getState().getSymbol(), color.dye(")")
+			));
 		}
-		sb.append(isClosed() ? " closed" : "");
+		sb.append(String.format(" [%d]%s", nrOfChecked(), isClosed() ? " closed" : ""));
 		return sb.toString();
+	}
+
+	private String span(int maxLength, String text) {
+		return String.format("%"+Math.max(1, maxLength - text.length())+"s", " ");
 	}
 
 	public boolean isClosed() {
@@ -105,7 +113,14 @@ public class Row extends EventHandler implements EventSource {
 		return cells.stream().filter(Cell::isChecked).count();
 	}
 
+	public boolean canCheck(Cell cell) {
+		return cell.getPos() >= firstActive;
+	}
+
 	public void check(Cell cell) {
+		if (!canCheck(cell)) {
+			throw new IllegalStateException(String.format("Cell %s can't be checked", cell));
+		}
 		cell.check();
 		shiftOrClose(cell.getPos());
 	}

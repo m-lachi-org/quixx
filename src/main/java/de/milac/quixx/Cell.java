@@ -8,6 +8,18 @@ public class Cell {
 	private final int pos;
 	private State state = ACTIVE;
 
+	public boolean matchById(String identifier) {
+		return identifier != null && identifier.equalsIgnoreCase(getId());
+	}
+
+	private String getId() {
+		return color.getId() + value;
+	}
+
+	public boolean isAfter(Cell cell) {
+		return color.equals(cell.getColor()) && pos > cell.getPos();
+	}
+
 	public enum State {
 		ACTIVE(" "), CHECKED("X");
 
@@ -59,6 +71,6 @@ public class Cell {
 
 	@Override
 	public String toString() {
-		return String.format("  %s-%d [%s]",color, value, state);
+		return String.format("%s (%d) (%s)", color.dyedName(), value, state.getSymbol());
 	}
 }

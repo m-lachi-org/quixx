@@ -33,7 +33,7 @@ public class Scorecard {
 		boolean matchFound = possibleMatchesWhite.stream().anyMatch(MatchResult::isPresent) ||
 			possibleMatchesColored.stream().anyMatch(MatchResult::isPresent);
 		if (matchFound) {
-			List<Cell> cells = strategy.bestMatches(possibleMatchesWhite, possibleMatchesColored);
+			List<Cell> cells = strategy.bestMatches(this, possibleMatchesWhite, possibleMatchesColored);
 			if (cells.isEmpty()) {
 				matchFound = false;
 			} else {
@@ -50,7 +50,7 @@ public class Scorecard {
 		List<MatchResult> possibleMatches = findPossibleMatchesWhite(diceCup);
 		AtomicBoolean matchFound = new AtomicBoolean(possibleMatches.stream().anyMatch(MatchResult::isPresent));
 		if (matchFound.get()) {
-			strategy.bestMatches(possibleMatches)
+			strategy.bestMatches(this, possibleMatches)
 				.ifPresentOrElse(this::check, () -> matchFound.set(false));
 		}
 		if (!matchFound.get()) {
@@ -74,6 +74,10 @@ public class Scorecard {
 			}
 		}
 		return possibleMatches;
+	}
+
+	public boolean canCheck(Cell cell) {
+		return rows.get(cell.getColor()).canCheck(cell);
 	}
 
 	void check(Cell cell) {

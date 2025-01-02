@@ -22,7 +22,7 @@ public class Dice {
 
 	@Override
 	public String toString() {
-		return String.format("[%s-%d]", color, value);
+		return String.format("%s (%d)", color.dyedName(), value);
 	}
 
 	public Color getColor() {

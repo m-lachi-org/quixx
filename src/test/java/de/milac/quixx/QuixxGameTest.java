@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class QuixxGameTest {
 	public static final Player PLAYER_1 = new Player("Player1");
 	public static final Player PLAYER_2 = new Player("Player2");
+	public static final Player PLAYER_3 = new Player("Player3");
 
 	@Test
 	void nextRoundWithoutPlayers() {
@@ -40,5 +41,15 @@ class QuixxGameTest {
 		assertThat(round2).isNotNull();
 		assertThat(round2.getPlayer()).isEqualTo(game.getCurrentPlayer()==0 ? PLAYER_1 : PLAYER_2);
 		assertThat(round2.getCoPlayers()).containsExactly(game.getCurrentPlayer()==0 ? PLAYER_2 : PLAYER_1);
+	}
+
+	@Test
+	void coPlayersOf() {
+		QuixxGame game = new QuixxGame();
+		game.join(PLAYER_1, PLAYER_2, PLAYER_3);
+
+		assertThat(game.coPlayersOf(PLAYER_1)).containsExactly(PLAYER_2, PLAYER_3);
+		assertThat(game.coPlayersOf(PLAYER_2)).containsExactly(PLAYER_3, PLAYER_1);
+		assertThat(game.coPlayersOf(PLAYER_3)).containsExactly(PLAYER_1, PLAYER_2);
 	}
 }

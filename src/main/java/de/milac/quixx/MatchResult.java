@@ -2,6 +2,7 @@ package de.milac.quixx;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public class MatchResult {
 	private final Cell match;
@@ -54,5 +55,12 @@ public class MatchResult {
 	@Override
 	public int hashCode() {
 		return Objects.hash(getMatch(), getColor(), getDistanceToFirstActive());
+	}
+
+	@Override
+	public String toString() {
+		return new StringJoiner(", ")
+			.add("match=" + match). add("row color=" + color)
+			.toString();
 	}
 }

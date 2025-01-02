@@ -5,6 +5,7 @@ import de.milac.quixx.dice.DiceCup;
 import java.util.List;
 
 public class Round {
+	public static final String LINE = "===================================";
 	private static int count = 0;
 
 	private final Player player;
@@ -14,7 +15,7 @@ public class Round {
 		this.player = player;
 		this.coPlayers = coPlayers;
 		count++;
-		System.out.printf("%nRound %d: %s%n", count, player);
+		System.out.printf("%n%s%nRound %d: %s%n%s%n", LINE, count, player, LINE);
 	}
 
 	public static int getCount() {
@@ -27,11 +28,11 @@ public class Round {
 
 	public boolean play() {
 		DiceCup diceCup = DiceCup.shake(player.getScorecard().getActiveColors());
-		System.out.printf("%s has rolled %s%n", player, diceCup);
+		System.out.printf("%s has rolled %s%n%s%n", player, diceCup, LINE);
 		player.matchOnTurn(diceCup);
 		System.out.println(player.getScorecard());
 		for (Player coPlayer : coPlayers) {
-			System.out.println(coPlayer);
+			System.out.printf("%s%n%s%n%s%n", LINE, coPlayer, LINE);
 			coPlayer.match(diceCup);
 			System.out.println(coPlayer.getScorecard());
 		}

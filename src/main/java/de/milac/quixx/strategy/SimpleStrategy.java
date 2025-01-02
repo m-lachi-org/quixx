@@ -2,6 +2,7 @@ package de.milac.quixx.strategy;
 
 import de.milac.quixx.Cell;
 import de.milac.quixx.MatchResult;
+import de.milac.quixx.Scorecard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +10,25 @@ import java.util.Optional;
 
 public class SimpleStrategy implements Strategy {
 	@Override
-	public Optional<Cell> bestMatches(List<MatchResult> possibleMatches) {
-		Optional<MatchResult> firstMatch = possibleMatches.stream().filter(MatchResult::isPresent).findFirst();
+	public Optional<Cell> bestMatches(Scorecard scorecard, List<MatchResult> possibleMatchesWhite) {
+		return findBestMatch(scorecard, possibleMatchesWhite, List.of());
+	}
+
+	private Optional<Cell> findBestMatch(Scorecard scorecard, List<MatchResult> possibleMatchesWhite, List<Cell> selectedToBeChecked) {
+		Optional<MatchResult> firstMatch = possibleMatchesWhite.stream()
+			.filter(mr -> mr.isPresent()
+				&& scorecard.canCheck(mr.getMatch().orElseThrow())
+				&& selectedToBeChecked.stream().noneMatch(c -> c.isAfter(mr.getMatch().orElseThrow()))
+			)
+			.findFirst();
 		return firstMatch.flatMap(MatchResult::getMatch);
 	}
 
 	@Override
-	public List<Cell> bestMatches(List<MatchResult> possibleMatchesWhite, List<MatchResult> possibleMatchesColored) {
+	public List<Cell> bestMatches(Scorecard scorecard, List<MatchResult> possibleMatchesWhite, List<MatchResult> possibleMatchesColored) {
 		List<Cell> matches = new ArrayList<>();
-		bestMatches(possibleMatchesWhite).ifPresent(matches::add);
-		bestMatches(possibleMatchesColored).ifPresent(matches::add);
+		findBestMatch(scorecard, possibleMatchesWhite, matches).ifPresent(matches::add);
+		findBestMatch(scorecard, possibleMatchesColored, matches).ifPresent(matches::add);
 		return matches;
 	}
 }
