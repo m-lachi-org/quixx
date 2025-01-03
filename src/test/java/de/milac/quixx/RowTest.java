@@ -2,6 +2,8 @@ package de.milac.quixx;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static de.milac.quixx.Color.RED;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,13 +33,33 @@ class RowTest {
 
 	@Test
 	void findMatchInactive() {
-		Row row = new Row(RED);
-		row.shiftOrClose(11);
-		MatchResult match = row.findMatch(2);
+		Row row1 = new Row(RED);
+		Row row2 = new Row(RED);
+		Row row3 = new Row(RED);
 
-		assertThat(match.isEmpty()).isTrue();
-		assertThat(match.getColor()).isEqualTo(RED);
-		assertThat(match.getDistanceToFirstActive()).isNegative();
+		row1.check(row1.getCellOfValue(12));
+		MatchResult match1 = row1.findMatch(2);
+
+		assertThat(match1.isEmpty()).isTrue();
+		assertThat(match1.getColor()).isEqualTo(RED);
+		assertThat(match1.getDistanceToFirstActive()).isNegative();
+
+		// should find match in same round
+		MatchResult match2 = row2.findMatch(12);
+
+		assertThat(match2.isEmpty()).isFalse();
+		assertThat(match2.getColor()).isEqualTo(RED);
+		assertThat(match2.getDistanceToFirstActive()).isEqualTo(10);
+		row2.check(match2.getMatch().orElseThrow());
+		assertThat(row2.nrOfChecked()).isEqualTo(2);
+
+		// should find match in same round
+		new Round(new Player("A"), List.of(new Player("B")));
+		MatchResult match3 = row3.findMatch(2);
+
+		assertThat(match3.isEmpty()).isTrue();
+		assertThat(match3.getColor()).isEqualTo(RED);
+		assertThat(match3.getDistanceToFirstActive()).isNegative();
 	}
 
 	@Test
@@ -94,7 +116,7 @@ class RowTest {
 		Row rowPlayer2 = new Row(RED);
 		assertThat(rowPlayer2.isClosed()).isFalse();
 
-		rowPlayer1.shiftOrClose(11);
+		rowPlayer1.check(rowPlayer1.getCellOfValue(12));
 
 		assertThat(rowPlayer1.isClosed()).isTrue();
 		assertThat(rowPlayer1.isActive()).isFalse();
@@ -143,15 +165,15 @@ class RowTest {
 
 		row.shiftOrClose(10);
 		assertThat(row.isActive()).isFalse();
-		assertThat(row.getFirstActive()).isEqualTo(-1);
+		assertThat(row.getFirstActive()).isEqualTo(12);
 		assertThat(rowOtherPlayer.isActive()).isFalse();
-		assertThat(rowOtherPlayer.getFirstActive()).isEqualTo(-1);
+		assertThat(rowOtherPlayer.getFirstActive()).isEqualTo(0);
 
 		row.shiftOrClose(11);
 		assertThat(row.isActive()).isFalse();
-		assertThat(row.getFirstActive()).isEqualTo(-1);
+		assertThat(row.getFirstActive()).isEqualTo(12);
 		assertThat(rowOtherPlayer.isActive()).isFalse();
-		assertThat(rowOtherPlayer.getFirstActive()).isEqualTo(-1);
+		assertThat(rowOtherPlayer.getFirstActive()).isEqualTo(0);
 	}
 
 	@Test

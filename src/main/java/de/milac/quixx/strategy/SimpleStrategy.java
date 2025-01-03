@@ -1,8 +1,6 @@
 package de.milac.quixx.strategy;
 
-import de.milac.quixx.Cell;
-import de.milac.quixx.MatchResult;
-import de.milac.quixx.Scorecard;
+import de.milac.quixx.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +28,10 @@ public class SimpleStrategy implements Strategy {
 		findBestMatch(scorecard, possibleMatchesWhite, matches).ifPresent(matches::add);
 		findBestMatch(scorecard, possibleMatchesColored, matches).ifPresent(matches::add);
 		return matches;
+	}
+
+	@Override
+	public void notifyOnTurn(Player player) {
+		System.out.printf("Please roll the dice, %s%n", player);
 	}
 }

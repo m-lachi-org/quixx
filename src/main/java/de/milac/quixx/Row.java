@@ -14,6 +14,7 @@ public class Row extends EventHandler implements EventSource {
 	private final Color color;
 	private final List<Cell> cells;
 	private int firstActive = 0;
+	private int closedInRound = -1;
 
 	public Row(Color color) {
 		this(color, new AscendingNumbers());
@@ -33,7 +34,7 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	public MatchResult findMatch(int... sums) {
-		if (isActive()) {
+		if (isActiveForCurrentRound()) {
 			for (int i = firstActive; i < cells.size(); i++) {
 				Cell cell = cells.get(i);
 				for (int sum : sums) {
@@ -56,15 +57,20 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	void shiftOrClose(int currentPos) {
-		if (!isClosed()) {
-			boolean closed = currentPos >= cells.size() - 2;
-			firstActive = closed ? -1 : currentPos + 1;
-			if (closed) {
+		firstActive = currentPos + 1;
+		boolean willClose = firstActive == cells.size() - 1;
+		if (willClose) {
+			check(cells.get(firstActive));
+			if (!isClosed()) {
 				System.out.println("Closing row " + color);
-				check(cells.get(cells.size() - 1));
+				setClosed();
 				fire(RowClosedEvent.of(color));
 			}
 		}
+	}
+
+	private void setClosed() {
+		closedInRound = Round.getCount();
 	}
 
 	public Color getColor() {
@@ -79,7 +85,7 @@ public class Row extends EventHandler implements EventSource {
 	@Override
 	public void handleEvent(Event event) {
 		if (event instanceof RowClosedEvent e && color.equals(e.getColor())) {
-			firstActive = -1;
+			setClosed();
 		}
 	}
 
@@ -102,11 +108,15 @@ public class Row extends EventHandler implements EventSource {
 	}
 
 	public boolean isClosed() {
-		return firstActive < 0;
+		return closedInRound > -1;
 	}
 
 	public boolean isActive() {
 		return !isClosed();
+	}
+
+	private boolean isActiveForCurrentRound() {
+		return isActive() || closedInRound == Round.getCount();
 	}
 
 	public long nrOfChecked() {

@@ -5,6 +5,8 @@ import de.milac.quixx.strategy.InteractiveStrategy;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.random.RandomGenerator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class QuixxGame {
 	private final List<Player> players = new LinkedList<>();
@@ -13,11 +15,17 @@ public class QuixxGame {
 	public static void main(String[] args) {
 		QuixxGame game = new QuixxGame();
 		game.join(
-			new Player("Alexandra", new InteractiveStrategy())
-			, new Player("Michael", new InteractiveStrategy())
-//			, new Player("Leonie")
-//			, new Player("Julian")
+			new Player("Alexandra")
+			, new Player("Michael")
+			, new Player("Leonie")
+			, new Player("Julian")
 		);
+//		game.join(
+//			new Player("Alexandra", new InteractiveStrategy())
+//			, new Player("Michael", new InteractiveStrategy())
+//			, new Player("Leonie", new InteractiveStrategy())
+//			, new Player("Julian", new InteractiveStrategy())
+//		);
 		Round round = game.start();
 		while (round.play()) {
 			round = game.nextRound();
@@ -60,15 +68,10 @@ public class QuixxGame {
 	}
 
 	List<Player> coPlayersOf(Player roundPlayer) {
-		List<Player> coPlayers = new LinkedList<>();
 		int idx = players.indexOf(roundPlayer);
-		int count = 1;
-		while (count < players.size()) {
-			idx = (idx == players.size() - 1) ? 0 : idx + 1;
-			coPlayers.add(players.get(idx));
-			count++;
-		}
-		return coPlayers;
+		return IntStream.range(1, players.size())
+			.mapToObj(i -> players.get((idx + i) % players.size()))
+			.collect(Collectors.toList());
 	}
 
 	void join(Player... playersToJoin) {

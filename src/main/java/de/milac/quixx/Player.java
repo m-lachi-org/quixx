@@ -7,6 +7,7 @@ import de.milac.quixx.strategy.Strategy;
 public class Player {
 	private final String name;
 	private final Scorecard scorecard;
+	private final Strategy strategy;
 
 	public Player(String name) {
 		this(name, new SimpleStrategy());
@@ -15,6 +16,7 @@ public class Player {
 	public Player(String name, Strategy strategy) {
 		this.name = name;
 		this.scorecard = new Scorecard(strategy);
+		this.strategy = strategy;
 	}
 
 	@Override
@@ -32,5 +34,9 @@ public class Player {
 
 	public void match(DiceCup diceCup) {
 		scorecard.match(diceCup);
+	}
+
+	public void notifyOnTurn() {
+		strategy.notifyOnTurn(this);
 	}
 }

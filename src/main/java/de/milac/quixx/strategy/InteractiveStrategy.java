@@ -2,9 +2,11 @@ package de.milac.quixx.strategy;
 
 import de.milac.quixx.Cell;
 import de.milac.quixx.MatchResult;
+import de.milac.quixx.Player;
 import de.milac.quixx.Scorecard;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,20 @@ public class InteractiveStrategy implements Strategy {
 		return chosenCells;
 	}
 
+	@Override
+	public void notifyOnTurn(Player player) {
+		System.out.printf("Please press <Enter> to roll the dice, %s%n", player);
+		requestUserInput();
+	}
+
+	private String requestUserInput() {
+		try {
+			return reader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private List<Cell> filterForPossibleCells(List<MatchResult> possibleMatchesWhite) {
 		return possibleMatchesWhite.stream().filter(MatchResult::isPresent).map(mr -> mr.getMatch().orElseThrow()).toList();
 	}
@@ -45,9 +61,9 @@ public class InteractiveStrategy implements Strategy {
 			boolean inputRequired = true;
 			while (inputRequired) {
 				try {
-					chosenCell = validateInput(type, reader.readLine(), possibleCells, scorecard, chosenCells);
+					chosenCell = validateInput(type, requestUserInput(), possibleCells, scorecard, chosenCells);
 					inputRequired = false;
-				} catch (Exception e) {
+				} catch (ValidationException e) {
 					System.out.printf("%s%nPlease try again%n", e.getMessage());
 				}
 			}
