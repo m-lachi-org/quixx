@@ -1,5 +1,6 @@
 package de.milac.quixx;
 
+import de.milac.quixx.Row.CheckResult;
 import de.milac.quixx.dice.DiceCup;
 import de.milac.quixx.layout.CardLayout;
 import de.milac.quixx.layout.DefaultCardLayout;
@@ -76,7 +77,7 @@ public class Scorecard {
 		return possibleMatches;
 	}
 
-	public boolean canCheck(Cell cell) {
+	public CheckResult canCheck(Cell cell) {
 		return rows.get(cell.getColor()).canCheck(cell);
 	}
 

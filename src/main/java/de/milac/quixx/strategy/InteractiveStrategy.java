@@ -1,9 +1,7 @@
 package de.milac.quixx.strategy;
 
-import de.milac.quixx.Cell;
-import de.milac.quixx.MatchResult;
-import de.milac.quixx.Player;
-import de.milac.quixx.Scorecard;
+import de.milac.quixx.*;
+import de.milac.quixx.Row.CheckResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +18,7 @@ public class InteractiveStrategy implements Strategy {
 		System.out.println(scorecard);
 		List<Cell> possibleCells = filterForPossibleCells(possibleMatchesWhite);
 		System.out.printf("Possible matches for WHITE dice: %s%n", possibleCells);
-		return requestFromUser("WHITE", possibleCells, scorecard, List.of());
+		return requestInput("WHITE", possibleCells, scorecard, List.of());
 	}
 
 	@Override
@@ -31,18 +29,18 @@ public class InteractiveStrategy implements Strategy {
 		System.out.printf("Possible matches for WHITE dice: %s%n", possibleCellsWhite);
 		List<Cell> possibleCellsColored = filterForPossibleCells(possibleMatchesColored);
 		System.out.printf("Possible matches for COLORED dice: %s%n", possibleCellsColored);
-		requestFromUser("WHITE", possibleCellsWhite, scorecard, chosenCells).ifPresent(chosenCells::add);
-		requestFromUser("COLORED", possibleCellsColored, scorecard, chosenCells).ifPresent(chosenCells::add);
+		requestInput("WHITE", possibleCellsWhite, scorecard, chosenCells).ifPresent(chosenCells::add);
+		requestInput("COLORED", possibleCellsColored, scorecard, chosenCells).ifPresent(chosenCells::add);
 		return chosenCells;
 	}
 
 	@Override
 	public void notifyOnTurn(Player player) {
 		System.out.printf("Please press <Enter> to roll the dice, %s%n", player);
-		requestUserInput();
+		requestConfirmation();
 	}
 
-	private String requestUserInput() {
+	private String requestConfirmation() {
 		try {
 			return reader.readLine();
 		} catch (IOException e) {
@@ -54,14 +52,14 @@ public class InteractiveStrategy implements Strategy {
 		return possibleMatchesWhite.stream().filter(MatchResult::isPresent).map(mr -> mr.getMatch().orElseThrow()).toList();
 	}
 
-	private Optional<Cell> requestFromUser(String type, List<Cell> possibleCells, Scorecard scorecard, List<Cell> chosenCells) {
+	private Optional<Cell> requestInput(String type, List<Cell> possibleCells, Scorecard scorecard, List<Cell> chosenCells) {
 		Optional<Cell> chosenCell = Optional.empty();
 		if (!possibleCells.isEmpty()) {
 			System.out.printf("Choose %s match or press <Enter> to skip:%n", type);
 			boolean inputRequired = true;
 			while (inputRequired) {
 				try {
-					chosenCell = validateInput(type, requestUserInput(), possibleCells, scorecard, chosenCells);
+					chosenCell = validateInput(type, requestConfirmation(), possibleCells, scorecard, chosenCells);
 					inputRequired = false;
 				} catch (ValidationException e) {
 					System.out.printf("%s%nPlease try again%n", e.getMessage());
@@ -79,8 +77,17 @@ public class InteractiveStrategy implements Strategy {
 		if (identifiedCell.isEmpty()) {
 			throw new ValidationException(String.format("No cell found in possible %s matches for input '%s'", type, userInput));
 		} else {
-			if (!scorecard.canCheck(identifiedCell.orElseThrow()) || chosenCells.stream().anyMatch(c -> c.isAfter(identifiedCell.orElseThrow()))) {
-				throw new ValidationException(String.format("Cell %s can't be checked", identifiedCell.orElseThrow()));
+			List<String> failureReasons = new ArrayList<>();
+			CheckResult checkResult = scorecard.canCheck(identifiedCell.orElseThrow());
+			if (!checkResult.isPassed()) {
+				failureReasons.add(checkResult.getFailureReason());
+			}
+			if (chosenCells.stream().anyMatch(c -> c.isAfter(identifiedCell.orElseThrow()))) {
+				failureReasons.add("Cell is before latest checked cell");
+			}
+			if (!failureReasons.isEmpty()) {
+				throw new ValidationException(String.format("Cell %s can't be checked: %s",
+					identifiedCell.orElseThrow(), String.join(", ", failureReasons)));
 			}
 		}
 		return identifiedCell;

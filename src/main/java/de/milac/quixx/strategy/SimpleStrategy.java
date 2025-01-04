@@ -15,7 +15,7 @@ public class SimpleStrategy implements Strategy {
 	private Optional<Cell> findBestMatch(Scorecard scorecard, List<MatchResult> possibleMatchesWhite, List<Cell> selectedToBeChecked) {
 		Optional<MatchResult> firstMatch = possibleMatchesWhite.stream()
 			.filter(mr -> mr.isPresent()
-				&& scorecard.canCheck(mr.getMatch().orElseThrow())
+				&& scorecard.canCheck(mr.getMatch().orElseThrow()).isPassed()
 				&& selectedToBeChecked.stream().noneMatch(c -> c.isAfter(mr.getMatch().orElseThrow()))
 			)
 			.findFirst();

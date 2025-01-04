@@ -133,10 +133,20 @@ class ScorecardTest {
 		assertThat(scorecard.getNrOfClosedRows()).isEqualTo(0);
 		assertThat(scorecard.getActiveColors()).isEqualTo(Color.allColored());
 
+		scorecard.check(scorecard.getRow(RED).getCellOfValue(7));
+		scorecard.check(scorecard.getRow(RED).getCellOfValue(8));
+		scorecard.check(scorecard.getRow(RED).getCellOfValue(9));
+		scorecard.check(scorecard.getRow(RED).getCellOfValue(10));
+		scorecard.check(scorecard.getRow(RED).getCellOfValue(11));
 		scorecard.check(scorecard.getRow(RED).getCellOfValue(12));
 		assertThat(scorecard.getNrOfClosedRows()).isEqualTo(1);
 		assertThat(scorecard.getActiveColors()).isEqualTo(new Color[]{YELLOW, GREEN, BLUE});
 
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(7));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(6));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(5));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(4));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(3));
 		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(2));
 		assertThat(scorecard.getNrOfClosedRows()).isEqualTo(2);
 		assertThat(scorecard.getActiveColors()).isEqualTo(new Color[]{YELLOW, GREEN});
@@ -161,19 +171,21 @@ class ScorecardTest {
 		scorecard.check(scorecard.getRow(GREEN).getCellOfValue(12));
 		scorecard.check(scorecard.getRow(GREEN).getCellOfValue(8));
 		scorecard.check(scorecard.getRow(GREEN).getCellOfValue(6));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(11));
 		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(10));
 		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(7));
 		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(4));
+		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(3));
 		scorecard.check(scorecard.getRow(BLUE).getCellOfValue(2));
 		score = scorecard.getScore();
 		System.out.println(score);
 
 		assertThat(score.getMisses()).isEqualTo(0);
-		assertThat(score.getTotal()).isEqualTo(25);
+		assertThat(score.getTotal()).isEqualTo(38);
 		assertThat(score.getRowScore(RED)).isEqualTo(1);
 		assertThat(score.getRowScore(YELLOW)).isEqualTo(3);
 		assertThat(score.getRowScore(GREEN)).isEqualTo(6);
-		assertThat(score.getRowScore(BLUE)).isEqualTo(15);
+		assertThat(score.getRowScore(BLUE)).isEqualTo(28);
 
 		scorecard.matchOnTurn(DiceCup.shake(
 			PredictableNumberGenerator.of(Color.WHITE, 3,3)
@@ -183,10 +195,10 @@ class ScorecardTest {
 		System.out.println(score);
 
 		assertThat(score.getMisses()).isEqualTo(1);
-		assertThat(score.getTotal()).isEqualTo(20);
+		assertThat(score.getTotal()).isEqualTo(33);
 		assertThat(score.getRowScore(RED)).isEqualTo(1);
 		assertThat(score.getRowScore(YELLOW)).isEqualTo(3);
 		assertThat(score.getRowScore(GREEN)).isEqualTo(6);
-		assertThat(score.getRowScore(BLUE)).isEqualTo(15);
+		assertThat(score.getRowScore(BLUE)).isEqualTo(28);
 	}
 }

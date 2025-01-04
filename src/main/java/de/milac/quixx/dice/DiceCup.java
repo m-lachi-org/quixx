@@ -12,13 +12,7 @@ public class DiceCup {
 	private final List<Dice> dice = new ArrayList<>();
 
 	DiceCup(Color... colors) {
-		dice.add(new Dice(WHITE));
-		dice.add(new Dice(WHITE));
-		for (Color color : colors) {
-			if (!WHITE.equals(color)) {
-				dice.add(new Dice(color));
-			}
-		}
+		this(Dice.DEFAULT_NUMBER_GENERATOR, colors);
 	}
 
 	DiceCup(NumberGenerator generator, Color... colors) {
@@ -45,7 +39,7 @@ public class DiceCup {
 			return new int[] { whiteDice.stream().map(Dice::getValue).reduce(0, Integer::sum) };
 		} else {
 			Dice coloredDice = dice.stream().filter(d -> d.getColor().equals(color)).findFirst()
-				.orElseThrow(() -> new IllegalArgumentException(String.format("No dice of color %s found: %s", color, this)));
+				.orElseThrow(() -> new IllegalArgumentException(String.format("No dice of color %s available in cup: %s", color, this)));
 			return new int[] {
 				Stream.of(whiteDice.get(0), coloredDice).map(Dice::getValue).reduce(0, Integer::sum),
 				Stream.of(whiteDice.get(1), coloredDice).map(Dice::getValue).reduce(0, Integer::sum)

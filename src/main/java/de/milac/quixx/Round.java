@@ -6,7 +6,9 @@ import java.util.List;
 
 public class Round {
 	public static final String LINE = "===================================";
-	private static int count = 0;
+	private static final int INITIAL_ROUND = 0;
+
+	private static int count = INITIAL_ROUND;
 
 	private final Player player;
 	private final List<Player> coPlayers;
@@ -22,11 +24,11 @@ public class Round {
 	}
 
 	public static void reset() {
-		count = 0;
+		count = INITIAL_ROUND;
 	}
 
 	public boolean play() {
-		System.out.printf("%n%n%n%s%nRound %d: %s has the turn%n", LINE, count, player);
+		System.out.printf("%n%n%n%s%nRound %d:%n%s has the turn%n", LINE, count, player);
 		player.notifyOnTurn();
 		DiceCup diceCup = DiceCup.shake(player.getScorecard().getActiveColors());
 		System.out.printf("%s has rolled %s%n%s%n", player, diceCup, LINE);
@@ -43,8 +45,8 @@ public class Round {
 	}
 
 	boolean gameOver() {
-		boolean maxRowsClosed = player.getScorecard().getNrOfClosedRows() >= 2;
-		boolean maxMissesReached = player.getScorecard().getNrOfMisses() == 4;
+		boolean maxRowsClosed = player.getScorecard().getNrOfClosedRows() >= Rules.MAX_CLOSED_ROWS_ALLOWED;
+		boolean maxMissesReached = player.getScorecard().getNrOfMisses() == Rules.MAX_MISSES_ALLOWED;
 		if (maxRowsClosed) {
 			System.out.printf("Game over! %d closed rows!%n", player.getScorecard().getNrOfClosedRows());
 		} else if (maxMissesReached) {

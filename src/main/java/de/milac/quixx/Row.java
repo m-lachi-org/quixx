@@ -7,6 +7,7 @@ import de.milac.quixx.event.RowClosedEvent;
 import de.milac.quixx.layout.AscendingNumbers;
 import de.milac.quixx.layout.RowLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -51,6 +52,10 @@ public class Row extends EventHandler implements EventSource {
 		return cells.get(idx);
 	}
 
+	Cell getLastCell() {
+		return cells.get(cells.size() - 2);
+	}
+
 	Cell getCellOfValue(int value) {
 		return cells.stream().filter(c -> c.getValue() == value).findFirst()
 			.orElseThrow(() -> new NoSuchElementException(String.format("No cell found for value %d", value)));
@@ -58,9 +63,9 @@ public class Row extends EventHandler implements EventSource {
 
 	void shiftOrClose(int currentPos) {
 		firstActive = currentPos + 1;
-		boolean willClose = firstActive == cells.size() - 1;
+		boolean willClose = isLast(currentPos);
 		if (willClose) {
-			check(cells.get(firstActive));
+			check(getCellAt(firstActive));
 			if (!isClosed()) {
 				System.out.println("Closing row " + color);
 				setClosed();
@@ -123,13 +128,36 @@ public class Row extends EventHandler implements EventSource {
 		return cells.stream().filter(Cell::isChecked).count();
 	}
 
-	public boolean canCheck(Cell cell) {
-		return cell.getPos() >= firstActive;
+	public CheckResult canCheck(Cell cell) {
+		List<String> failureReasons = new ArrayList<>();
+		if (cell.getPos() < firstActive) {
+			failureReasons.add("Cell is before latest checked cell");
+		}
+		if (isLast(cell) && nrOfChecked() < Rules.MIN_CHECKED_BEFORE_CLOSE) {
+			failureReasons.add("Must check 5 cells before closing");
+		}
+		if (isCloseCell(cell) && !getLastCell().isChecked()) {
+			failureReasons.add("Must check last cell before closing");
+		}
+		return CheckResult.of(failureReasons.isEmpty(), String.join(", ", failureReasons));
+	}
+
+	private boolean isCloseCell(Cell cell) {
+		return cell.getPos() == cells.size() - 1;
+	}
+
+	private boolean isLast(Cell cell) {
+		return isLast(cell.getPos());
+	}
+
+	private boolean isLast(int pos) {
+		return pos == cells.size() - 2;
 	}
 
 	public void check(Cell cell) {
-		if (!canCheck(cell)) {
-			throw new IllegalStateException(String.format("Cell %s can't be checked", cell));
+		CheckResult checkResult = canCheck(cell);
+		if (!checkResult.isPassed()) {
+			throw new IllegalStateException(String.format("Cell %s can't be checked: %s", cell, checkResult.getFailureReason()));
 		}
 		cell.check();
 		shiftOrClose(cell.getPos());
@@ -137,5 +165,27 @@ public class Row extends EventHandler implements EventSource {
 
 	public int getFirstActive() {
 		return firstActive;
+	}
+
+	public static class CheckResult {
+		private final boolean passed;
+		private final String failureReason;
+
+		private CheckResult(boolean passed, String failureReason) {
+			this.passed = passed;
+			this.failureReason = failureReason;
+		}
+
+		public static CheckResult of(boolean passed, String failureReason) {
+			return new CheckResult(passed, failureReason);
+		}
+
+		public boolean isPassed() {
+			return passed;
+		}
+
+		public String getFailureReason() {
+			return failureReason;
+		}
 	}
 }
