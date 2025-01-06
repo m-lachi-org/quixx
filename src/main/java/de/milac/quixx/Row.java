@@ -39,7 +39,7 @@ public class Row extends EventHandler implements EventSource {
 			for (int i = firstActive; i < cells.size(); i++) {
 				Cell cell = cells.get(i);
 				for (int sum : sums) {
-					if (cell.match(sum)) {
+					if (cell.match(sum) && canCheck(cell).isPassed()) {
 						return MatchResult.of(cell, color, firstActive);
 					}
 				}

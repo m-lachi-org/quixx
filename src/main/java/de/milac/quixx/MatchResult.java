@@ -1,13 +1,11 @@
 package de.milac.quixx;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class MatchResult {
 	private final Cell match;
 	private final Color color;
-	private final int distanceToFirstActive;
+	private int distanceToFirstActive;
 
 	private MatchResult(Cell match, Color color, int firstActiveInRow) {
 		this.match = match;
@@ -62,5 +60,15 @@ public class MatchResult {
 		return new StringJoiner(", ")
 			.add("match=" + match). add("row color=" + color)
 			.toString();
+	}
+
+	public MatchResult updateDistanceToFirstActive(List<Cell> selectedToBeChecked) {
+		if (!isEmpty()) {
+			selectedToBeChecked.stream()
+				.filter(c -> c.isBefore(getMatch().orElseThrow()))
+				.max(Comparator.comparingInt(Cell::getPos))
+				.ifPresent(c -> distanceToFirstActive = getMatch().orElseThrow().getPos() - c.getPos());
+		}
+		return this;
 	}
 }

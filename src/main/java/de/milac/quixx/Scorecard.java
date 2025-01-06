@@ -44,6 +44,7 @@ public class Scorecard {
 		if (!matchFound) {
 			System.out.println("Nothing matches!");
 			nrOfMisses++;
+			strategy.notifyOnMiss(nrOfMisses);
 		}
 	}
 

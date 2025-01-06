@@ -20,6 +20,10 @@ public class Cell {
 		return color.equals(cell.getColor()) && pos > cell.getPos();
 	}
 
+	public boolean isBefore(Cell cell) {
+		return color.equals(cell.getColor()) && pos < cell.getPos();
+	}
+
 	public enum State {
 		ACTIVE(" "), CHECKED("X");
 

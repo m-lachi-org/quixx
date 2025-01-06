@@ -34,12 +34,12 @@ public class Round {
 		System.out.printf("%s has rolled %s%n%s%n", player, diceCup, LINE);
 
 		player.matchOnTurn(diceCup);
-		System.out.println(player.getScorecard());
+		System.out.printf("%n%s%n", player.getScorecard());
 
 		for (Player coPlayer : coPlayers) {
 			System.out.printf("%s%n%s%n%s%n", LINE, coPlayer, LINE);
 			coPlayer.match(diceCup);
-			System.out.println(coPlayer.getScorecard());
+			System.out.printf("%n%s%n", coPlayer.getScorecard());
 		}
 		return !gameOver();
 	}

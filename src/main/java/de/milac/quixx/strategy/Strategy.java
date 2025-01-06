@@ -11,4 +11,13 @@ public interface Strategy {
 	List<Cell> bestMatches(Scorecard scorecard, List<MatchResult> possibleMatchesWhite, List<MatchResult> possibleMatchesColored);
 
 	void notifyOnTurn(Player player);
+
+	void notifyOnMiss(int nrOfMisses);
+
+	default List<Cell> filterForPossibleCells(List<MatchResult> possibleMatchesWhite) {
+		return possibleMatchesWhite.stream()
+			.filter(MatchResult::isPresent)
+			.map(mr -> mr.getMatch().orElseThrow())
+			.toList();
+	}
 }

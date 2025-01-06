@@ -20,12 +20,6 @@ public class QuixxGame {
 			, new Player("Leonie")
 			, new Player("Julian")
 		);
-//		game.join(
-//			new Player("Alexandra", new InteractiveStrategy())
-//			, new Player("Michael", new InteractiveStrategy())
-//			, new Player("Leonie", new InteractiveStrategy())
-//			, new Player("Julian", new InteractiveStrategy())
-//		);
 		Round round = game.start();
 		while (round.play()) {
 			round = game.nextRound();
